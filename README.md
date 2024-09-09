@@ -21,7 +21,8 @@ npm install express         # 安装依赖
 ```
 
 ### 第二步
-由于使用摄像头需要https协议，所以需要生成https证书，
+由于使用摄像头需要https协议，所以需要生成https证书
+
 如果有域名的这里替换为域名的证书，没有的自己生成一个，浏览器会报不安全，但不影响使用
 ```
 mkdir ssl
@@ -59,7 +60,9 @@ node run.js                 # 访问 https://[ipv6]:8887
 ![](./images/3.png)
 
 ## 4.最后
-项目参考了，感谢大佬对WebRTC技术的讲解
+项目参考了
 [github.com/shushushv/webrtc-p2p](https://github.com/shushushv/webrtc-p2p)
+
+感谢大佬对WebRTC技术的讲解
 
 
