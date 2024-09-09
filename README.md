@@ -21,9 +21,11 @@ npm install express         # 安装依赖
 ```
 
 ### 第二步
-由于使用摄像头需要https协议，所以需要进入ssl文件夹生成https证书，
+由于使用摄像头需要https协议，所以需要生成https证书，
 如果有域名的这里替换为域名的证书，没有的自己生成一个，浏览器会报不安全，但不影响使用
 ```
+mkdir ssl
+
 cd ssl
 
 openssl req -nodes -new -x509 -keyout private-key.pem -out certificate.pem -days 3650
