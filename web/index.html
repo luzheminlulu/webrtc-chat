@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>视频通话</title>
+	<style>
+	h1{
+		text-align: center;
+		margin: 100px auto;
+	}
+	.container {
+		width: 50%;
+		height : 50px;
+		margin: 50px auto;
+		padding: 10px 30px;
+		display: flex; 
+		align-items: center; /* 垂直居中 */  
+		border-radius: 4px;
+		border: 1px solid #ebeef5;
+		box-shadow: 0 2px 12px 0 rgba(0,0,0,.1);
+		color: #303133;
+	}
+	.inputBox {
+		width: 85%;
+		height :60%;
+		margin: 1%;
+		padding : 0px 10px;
+	}
+	.assignValue_button{
+		width: 10%;
+		height :70%;
+
+		font-size: 120%;
+
+		border: none;
+		background-color: transparent;
+		cursor: pointer;
+	}
+	</style>
+</head>
+<body>
+	<h1>视频通话</h1>
+	<div class="container">
+
+        <input id="inputBox" type="text" class="inputBox" placeholder="请输入房间名" />
+        <button onclick="assignValue()" class="assignValue_button">进入</button>
+    </div>
+
+	<script>
+        function assignValue() {
+            const inputValue = document.getElementById('inputBox').value;
+            if(inputValue){
+			const url = `./room/${inputValue}`; // 构建链接
+				window.open(url, '_self'); // 在新标签页中打开链接
+			}else{
+				alert("房间名不能为空");
+			}
+        }
+		
+        document.getElementById("inputBox").addEventListener('keypress', function(event) {  
+            if (event.key === 'Enter') {  
+                assignValue();  
+            }  
+        });  
+
+
+    </script>
+</body>
+</html>
