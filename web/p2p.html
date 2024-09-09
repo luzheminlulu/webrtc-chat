@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<link rel="stylesheet" type="text/css" href="/p2p.css" />
+	<title>视频通话</title>
+</head>
+<body>
+	<div id="container">
+		<div class="video-box">
+			<video id="remote-video"></video>
+			<video id="local-video" muted></video>
+			<div class="logger"></div>
+		</div>
+
+	
+	
+		<button class="start-button" onclick="startLive()">start</button>
+		<button class="stop-button"  onclick="stopPeerConnection()">stop</button>
+		
+		<select id="cameraSelect"></select> 
+		<select id="audioInputSelect"></select> 
+		
+	</div>
+
+	
+	<script src='/p2p.js' charset='utf-8'></script>
+</body>
+</html>

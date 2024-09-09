@@ -1,0 +1,133 @@
+body {  
+
+	width: 100vw; 
+	height: 100vh; 
+
+	margin: 0; 
+}
+
+#container {
+	width: 100vw;
+	height : 100vh;
+	
+	position : fixed ;
+	
+	top : 0;
+	left : 0;
+	
+	padding: 1px;
+}
+
+.logger {
+	position: absolute;
+
+	width: 15%;
+	height: 50%;
+	
+	margin: 1px; 
+	
+	top : 0;
+	right : 0;
+	
+	padding: 1px;
+	padding-right : 20px;
+	
+	color: #4fbf40;
+	border-radius: 6px;
+	
+	background-color: rgba(125, 125, 125, 0.2); 
+	
+    overflow-y: auto; /* 只添加垂直滚动条 */  
+    overflow-x: hidden; /* 隐藏水平滚动条 */  
+	
+	
+}
+
+
+.video-box {
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+}
+
+
+#remote-video {
+	width: 100%;
+	height: 100%;
+	display: block;
+	
+	border: 1px solid #eee;
+	background-color: #F2F6FC;
+}
+
+#local-video {
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	width: 15%;
+	height: 15%;
+
+	border: 1px solid #eee;
+	border-radius: 6px;
+	background-color: #EBEEF5;
+}
+
+.start-button , .stop-button{
+	
+	
+	position: absolute;
+	
+	left: 10%;
+	bottom : 30px;
+	
+	width: 15%;
+	height:35px;
+	
+	display: none;
+	
+	line-height: 20px;
+	outline: none;
+	color: #fff;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	/*transform: translate(-50%, -50%);*/
+}
+
+.start-button {
+	background-color: #409eff;
+}
+.stop-button {
+	background-color: #ff9e40;
+}
+
+#cameraSelect,#audioInputSelect{
+	
+	position: absolute;
+	
+	bottom : 30px;
+	
+	width: 20%;
+	height:35px;
+	
+	line-height: 20px;
+	outline: none;
+	border: none;
+	border-radius: 4px;
+
+	/*transform: translate(-50%, -50%);*/
+	
+}
+
+#cameraSelect{
+	left: calc(10% + 15% + 5%);
+}
+#audioInputSelect{
+	left: calc(10% + 15% + 5% + 20% + 5%);
+}
+
+.logger .error {
+	color: #DD4A68;
+}
+
+
