@@ -32,10 +32,10 @@ body {
 	padding: 1px;
 	padding-right : 20px;
 	
-	color: #4fbf40;
+	color: #406fbf;
 	border-radius: 6px;
 	
-	background-color: rgba(125, 125, 125, 0.2); 
+	background-color: rgba(255, 255, 255, 0); 
 	
     overflow-y: auto; /* 只添加垂直滚动条 */  
     overflow-x: hidden; /* 隐藏水平滚动条 */  
@@ -70,6 +70,8 @@ body {
 	border: 1px solid #eee;
 	border-radius: 6px;
 	background-color: #EBEEF5;
+
+	transform: scaleX(-1);
 }
 
 .start-button , .stop-button{
