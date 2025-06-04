@@ -1,4 +1,10 @@
 
+
+
+
+
+
+
 function setFullHeight() {  
     const vh = window.innerHeight * 0.01; // 计算 1vh  
     document.documentElement.style.setProperty('--vh', `${vh}px`); // 设置 CSS 变量  
@@ -39,7 +45,7 @@ const message = {
 
 const localVideo = document.querySelector('#local-video');
 const remoteVideo = document.querySelector('#remote-video');
-const button_strat = document.querySelector('.start-button');
+const button_start = document.querySelector('.start-button');
 const button_stop = document.querySelector('.stop-button'); 
 const cameraSelect = document.getElementById('cameraSelect');  
 
@@ -64,7 +70,7 @@ const socket = new WebSocket(wsUrl);
 
 socket.onopen = () => {
 	//message.log('信令通道创建成功！');
-	button_strat.style.display = 'block';
+	button_start.style.display = 'block';
 	button_stop.style.display = 'none';
 }
 
@@ -100,11 +106,13 @@ async function processQueue() {
 			message.log(data);
 		} else if (type === 'info_full') {
 			message.log(data);
-			button_strat.style.display = 'none';
+			button_start.style.display = 'none';
 			button_stop.style.display = 'none';
 			//window.open("/", '_self');
 		} else if (type === 'cmd_stop') {
 			stopPeerConnection(1);
+		} else if (type === 'cmd_update') {
+			location.reload();
 		}
     }
 }  
@@ -150,12 +158,19 @@ var cameraID,audioID;
 
 async function startLive (offerSdp) {
 
-	button_strat.style.display = 'none';
+	button_start.style.display = 'none';
 	button_stop.style.display  = 'block';
-	
-		
+
+	const constraints = {
+		video: true,
+		audio: true
+	  };
+  
+	  // 请求媒体设备访问权限
+	await navigator.mediaDevices.getUserMedia(constraints);
+
 	await startCamera(cameraID,audioID);
-		if(stream){
+	if(stream){
 		stream.getTracks().forEach(track => {  
 	        peer.addTrack(track, stream);  
 	    });
@@ -189,7 +204,7 @@ async function startLive (offerSdp) {
 
 async function stopPeerConnection(mine) {  
 
-	button_strat.style.display = 'block';
+	button_start.style.display = 'block';
 	button_stop.style.display = 'none';
 	
 	
@@ -248,6 +263,10 @@ async function getCameraList() {
     option.value = "DISPLAYSHARE";  
     option.text = "屏幕共享";  
     cameraSelect.appendChild(option);  
+    const option2 = document.createElement('option');  
+    option2.value = "NOCAMERA";  
+    option2.text = "关闭摄像头";  
+    cameraSelect.appendChild(option2);  
 
 
     let cameraID_cookie = getCookie("cameraID");
@@ -328,17 +347,33 @@ async function startCamera(cameraID,audioID) {
 						},   
 				audio: audioID==="NOMICROPHONE" ? false : true ,    
 			});
+			// 获取屏幕流（不包含音频）
+			//const stream = await navigator.mediaDevices.getDisplayMedia({
+			//  video: { cursor: "always" },
+			//  audio: false
+			//});
+
+			//// 获取麦克风流
+			//const micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+			//// 合并音轨到屏幕流
+			//micStream.getAudioTracks().forEach(track => {
+			//  stream.addTrack(track);
+			//});
+
 			message.log('打开屏幕共享');
 		 } else {
-			 
-			stream = await navigator.mediaDevices.getUserMedia({
-				video: {			
+			let videoen =  cameraID==="NOCAMERA" ? false :
+				{
 					facingMode: 'user', // 'user' 表示前置摄像头，'environment' 表示后置摄像头  
 					width: { ideal: 1920 }, // 理想宽度  
 					height: { ideal: 1080 }, // 理想高度  
 					frameRate: { ideal: 30 }, // 理想帧率  
 					deviceId: { exact: cameraID },
-					} , 
+				}
+
+			stream = await navigator.mediaDevices.getUserMedia({
+				video: videoen , 
 				audio: audioen ,    
 			});
 			message.log('打开摄像头/麦克风');
@@ -357,23 +392,80 @@ async function startCamera(cameraID,audioID) {
 	
 }
 
+async function change_camera(){
+	if(stream) {
+		//await stopPeerConnection();
+		//await startLive();
+		const [oldVideoTrack] = stream.getVideoTracks();
+		const [oldAudioTrack] = stream.getAudioTracks();
+
+		await startCamera(cameraID,audioID);
+
+
+		if(stream){
+			const [newVideoTrack] = stream.getVideoTracks();
+			const [newAudioTrack] = stream.getAudioTracks();
+
+    		// 3. 替换轨道核心逻辑
+    		const senders = peer.getSenders();
+    		const videoSender = senders.find(s => s.track?.kind === 'video');
+			const audioSender = senders.find(s => s.track?.kind === 'audio');
+			
+			if(oldVideoTrack) {
+    		  	oldVideoTrack.stop();
+    		  	stream.removeTrack(oldVideoTrack);
+			}
+			if(newVideoTrack) {
+    			if (videoSender) {
+    			  	// 使用 replaceTrack 无缝替换轨道（无需重新协商）
+    			  	await videoSender.replaceTrack(newVideoTrack);
+    			}
+				// 4. 停止旧轨道并更新本地流
+    			stream.addTrack(newVideoTrack);
+    			// 5. 更新页面视频元素（假设有 localVideo 元素）
+    			const localVideo = document.getElementById('localVideo');
+    			if (localVideo) localVideo.srcObject = stream;
+				
+			}
+
+
+			if(oldAudioTrack) {
+				oldAudioTrack.stop(); 
+				stream.removeTrack(oldAudioTrack);
+			}
+			if (newAudioTrack) {
+    		  	if (audioSender) {
+    		  	  	await audioSender.replaceTrack(newAudioTrack);
+    		  	}
+
+				stream.addTrack(newAudioTrack);
+
+    		}
+
+		}
+	}
+}
+
 document.getElementById('cameraSelect').addEventListener('change', async(event) => {
 	cameraID = event.target.value ;
 	setCookie("cameraID",cameraID,60);
-	if(stream) {
-		await stopPeerConnection();
-		await startLive();
-	}
+
+	await change_camera();
 });  
 
 document.getElementById('audioInputSelect').addEventListener('change', async(event) => {  
     
 	audioID = event.target.value;
-	setCookie("audioID",audioID,60);
-	if(stream) {
-		await stopPeerConnection();
-		await startLive();
-	}
+	if(audioID != "NOMICROPHONE")
+		setCookie("audioID",audioID,60);
+	
+	await change_camera();
 }); 
 
 
+function update_you() {
+		socket.send(JSON.stringify({
+			type: `cmd_update`,
+		}));
+		console.log("已刷新");
+	}
