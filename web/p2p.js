@@ -112,7 +112,10 @@ async function processQueue() {
 		} else if (type === 'cmd_stop') {
 			stopPeerConnection(1);
 		} else if (type === 'cmd_update') {
-			location.reload();
+			console.log("5s后刷新...");
+			window.setTimeout( function() {
+				location.reload();
+			}, 5000);
 		}
     }
 }  
@@ -221,25 +224,40 @@ async function stopPeerConnection(mine) {
 	
 	
 	if(stream){
-	//	peer.getSenders().forEach(sender => {  
-	//		sender.track.stop(); // 停止当前轨道  
-	//		peer.removeTrack(sender); // 从对等连接中移除  
-	//	});  
-	//
-		stream.getTracks().forEach(track => {  
-			track.stop(); // 停止每个轨道  
-		});  
+		//console.log("stop");
+      	stream.getTracks().forEach(track => {
+        	track.stop();
+        	track.enabled = false;
+      	});
+      
+      	// 移除所有视频轨道
+      	stream.getVideoTracks().forEach(track => stream.removeTrack(track));
+      
+      	// 重置视频元素
+      	localVideo.pause();
+      	localVideo.srcObject = null;
+      	localVideo.load(); // 关键步骤
+
+      	remoteVideo.pause();
+      	remoteVideo.srcObject = null;
+      	remoteVideo.load(); // 关键步骤
+
 	}
 
-	
-    await peer.close();
+	stream = null ;
+    peer.close();
 	
 	await newPeer();
 
 }
 
 
-
+// 页面关闭时自动停止
+window.addEventListener('beforeunload', () => {
+  if (stream) {
+    stream.getTracks().forEach(track => track.stop());
+  }
+});
 
 async function getCameraList() {  
 
@@ -462,10 +480,11 @@ document.getElementById('audioInputSelect').addEventListener('change', async(eve
 	await change_camera();
 }); 
 
-
+/*
 function update_you() {
 		socket.send(JSON.stringify({
 			type: `cmd_update`,
 		}));
 		console.log("已刷新");
 	}
+*/
