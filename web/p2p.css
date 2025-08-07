@@ -89,7 +89,7 @@ body {
 	
 	line-height: 20px;
 	outline: none;
-	color: #fff;
+	color: #FFFFFF;
 	border: none;
 	border-radius: 4px;
 	cursor: pointer;
@@ -97,10 +97,10 @@ body {
 }
 
 .start-button {
-	background-color: #409eff;
+	background-color: #409eff80;
 }
 .stop-button {
-	background-color: #ff9e40;
+	background-color: #ff9e4080;
 }
 
 #cameraSelect,#audioInputSelect{
@@ -116,6 +116,8 @@ body {
 	outline: none;
 	border: none;
 	border-radius: 4px;
+
+	background-color: #EBEEF580;
 
 	/*transform: translate(-50%, -50%);*/
 	
