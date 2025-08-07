@@ -26,7 +26,7 @@ function client_equal_send(ws,message){
 wss.on('connection', (ws, req) => { 
 	ws.url_info = req.url;  
 	ws.url_base = req.socket.remoteAddress ;
-	console.log(`Client connected: ${ws.url_info}`);  
+	//console.log(`Client connected: ${ws.url_info}`);  
 	
 	let this_ws_info = "" ;
 	let this_ws_cnt  = 0  ;
@@ -43,7 +43,7 @@ wss.on('connection', (ws, req) => {
 	if(this_ws_cnt>1){
 		message_info = {
 			"type" : "info_full" ,
-			"data" : `此房间已被${this_ws_info}占用，请更换房间` ,
+			"data" : `此房间已被占用，请更换房间` ,
 		} ;
 		ws.send( JSON.stringify(message_info) );
 		
@@ -101,9 +101,22 @@ app.get('/p2p.js', (req, res) => {
 app.get('/p2p.css', (req, res) => {
 	res.sendFile('./web/p2p.css', { root: __dirname });
 });
+app.get('/favicon.png', (req, res) => {
+	res.sendFile('./web/favicon.png', { root: __dirname });
+});
 app.get('/room/*', (req, res) => {
 	res.sendFile('./web/p2p.html', { root: __dirname });
 });
+app.get('/update_all', (req, res) => {
+	let update_cnt = 0;
+	wss.clients.forEach((client) => {  
+		client.send( JSON.stringify({type: `cmd_update`}) ); 
+		update_cnt++;
+	});
+	res.send(`<h1>已发送${update_cnt}个更新请求</h1>`);
+	setTimeout( () => {process.exit(0);}, 1000 );
+});
+
 
 
 server.listen(PORT, () => {  
