@@ -1,137 +1,166 @@
-body {  
-
-	width: 100vw; 
-	height: 100vh; 
-
-	margin: 0; 
+/* 全局基础设置 */
+body {
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: #0a0a0a;
+    overflow: hidden;
 }
 
 #container {
-	width: 100vw;
-	height : 100vh;
-	
-	position : fixed ;
-	
-	top : 0;
-	left : 0;
-	
-	padding: 1px;
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #050505;
 }
-
-.logger {
-	position: absolute;
-
-	width: 15%;
-	height: 30%;
-	
-	margin: 1px; 
-	
-	top : 0;
-	right : 0;
-	
-	padding: 1px;
-	padding-right : 20px;
-	
-	color: #406fbf7e;
-	border-radius: 6px;
-	
-	background-color: rgba(255, 255, 255, 0); 
-	
-    overflow-y: auto; /* 只添加垂直滚动条 */  
-    overflow-x: hidden; /* 隐藏水平滚动条 */  
-	
-	
-}
-
 
 .video-box {
-	width: 100%;
-	height: 100%;
-	object-fit: contain;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
 }
 
-
 #remote-video {
-	width: 100%;
-	height: 100%;
-	display: block;
-	
-	border: 1px solid #eee;
-	background-color: #F2F6FC;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
 #local-video {
-	position: absolute;
-	right: 0;
-	bottom: 0;
-	width: 15%;
-	height: 15%;
-
-	border: 1px solid #eee;
-	border-radius: 6px;
-	background-color: #EBEEF5;
-
-	transform: scaleX(-1);
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    width: 120px;
+    /*aspect-ratio: 16 / 9;*/
+    border-radius: 8px;
+    box-shadow: 0 rgba(0,0,0,0);
+    border: none;
+    background-color: transparent;
+    transform: scaleX(-1);
+    z-index: 10;
+    cursor: move;
+    touch-action: none;
+    /* 自适应视频分辨率，完整显示不裁切 */
+    object-fit: contain;
+    object-position: center;
+    user-select: none;
 }
 
-.start-button , .stop-button{
-	
-	
-	position: absolute;
-	
-	left: 10%;
-	bottom : 30px;
-	
-	width: 15%;
-	height:35px;
-	
-	display: none;
-	
-	line-height: 20px;
-	outline: none;
-	color: #FFFFFF;
-	border: none;
-	border-radius: 4px;
-	cursor: pointer;
-	/*transform: translate(-50%, -50%);*/
+#time_counter {
+    position: absolute;
+    left: 15px;
+    top: 15px;
+    padding: 4px 12px;
+    color: #ffffffC0;
+    background: rgba(40, 40, 40, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 6px;
+    font-size: 24px;
+    z-index: 100;
 }
 
-.start-button {
-	background-color: #409eff80;
-}
-.stop-button {
-	background-color: #ff9e4080;
-}
-
-#cameraSelect,#audioInputSelect{
-	
-	position: absolute;
-	
-	bottom : 30px;
-	
-	width: 20%;
-	height:35px;
-	
-	line-height: 20px;
-	outline: none;
-	border: none;
-	border-radius: 4px;
-
-	background-color: #EBEEF580;
-
-	/*transform: translate(-50%, -50%);*/
-	
+/* 底部控制栏：改为弹性布局以适配手机 */
+.controls-bar {
+    position: absolute;
+    bottom: 25px;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    padding: 0 10px;
+    box-sizing: border-box;
+    z-index: 110;
 }
 
-#cameraSelect{
-	left: calc(10% + 15% + 5%);
+/* 统一控制栏元素样式 */
+.start-button, .stop-button, #cameraSelect, #audioInputSelect {
+    position: static; /* 取消之前的绝对定位 */
+    height: 38px;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    background-color: rgba(45, 45, 45, 0.6);
+    color: white;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
 }
-#audioInputSelect{
-	left: calc(10% + 15% + 5% + 20% + 5%);
+
+.start-button, .stop-button {
+    width: 70px;
+    flex-shrink: 0;
+}
+
+.start-button { background-color: rgba(46, 125, 50, 0.4); }
+.stop-button { background-color: rgba(198, 40, 40, 0.4); }
+
+#cameraSelect, #audioInputSelect {
+    flex: 1; /* 自动撑开 */
+    max-width: 80px;
+    padding: 0 5px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background-color: rgba(45, 45, 45, 0.4);
+}
+
+/* 桌面端大屏幕微调 */
+@media (min-width: 768px) {
+    #local-video { width: 240px; }
+    .start-button, .stop-button { width: 160px; }
+    #cameraSelect, #audioInputSelect { max-width: 220px; }
+}
+
+.logger {
+    /* 1. 定位：放在左侧，计时器下方 */
+    position: absolute;
+    top: 40px; /* 避开左上角的计时器 */
+    right: 10px;
+    
+    /* 2. 尺寸与布局 */
+    width: 220px;
+    max-height: 20%; /* 限制高度，防止刷屏遮挡 */
+    padding: 10px;
+    
+    /* 3. 视觉：精致半透明风格 */
+    background: rgba(0, 0, 0, 0.4); /* 暗色半透明 */
+    backdrop-filter: blur(8px);    /* 毛玻璃效果，确保在浅色背景下也能看清字 */
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 8px;
+    /*border: 1px solid rgba(255, 255, 255, 0.1);*/
+    
+    /* 4. 文字样式 */
+    color: rgba(255, 255, 255, 0.5);
+    font-family: 'Courier New', Courier, monospace; /* 等宽字体，更有代码日志感 */
+    font-size: 11px;
+    line-height: 1.4;
+    
+    /* 5. 交互与滚动 */
+    overflow-y: auto;
+    pointer-events: auto; /* 允许滚动查看日志 */
+    z-index: 90; /* 确保在视频之上，但在控制按钮之下 */
+    
+    /* 隐藏滚动条 (可选，让界面更干净) */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.2) transparent;
+}
+
+/* 针对不同日志类型的颜色区分 */
+.logger div {
+    margin-bottom: 4px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 2px;
 }
 
 .logger .error {
-	color: #DD4A687E;
+    color: #ff4d4f; /* 醒目的红色错误提示 */
+    font-weight: bold;
 }
 
-
+.logger .info {
+    color: #40a9ff; /* 蓝色信息提示 */
+}
