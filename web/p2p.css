@@ -71,8 +71,8 @@ body {
     left: 0;
     width: 100%;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: left;
+    align-items: left;
     gap: 10px;
     padding: 0 10px;
     box-sizing: border-box;
@@ -105,7 +105,7 @@ body {
     max-width: 80px;
     padding: 0 5px;
     border: 1px solid rgba(255,255,255,0.1);
-    background-color: rgba(45, 45, 45, 0.4);
+    background-color: rgba(255, 255, 255, 0.5);
 }
 
 /* 桌面端大屏幕微调 */
