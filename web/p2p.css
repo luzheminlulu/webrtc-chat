@@ -52,7 +52,7 @@ body {
 
 #time_counter {
     position: absolute;
-    left: 15px;
+    left: 20px;
     top: 15px;
     padding: 4px 12px;
     color: #ffffffC0;
@@ -68,7 +68,7 @@ body {
 .controls-bar {
     position: absolute;
     bottom: 25px;
-    left: 0;
+    left: 20px;
     width: 100%;
     display: flex;
     justify-content: left;
