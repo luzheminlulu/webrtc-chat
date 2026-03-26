@@ -1,6 +1,11 @@
 
 # 自建服务器实现视频通话 (WebRTC + WebSocket)
 
+
+## 2016年3月26日更新
+
+- 添加聊天框
+
 ## 2026年3月16日更新
 
 - UI美化
@@ -9,7 +14,7 @@
 - 网络状态显示
 - 增加网络中断后重连逻辑
 - 服务器端增加掉线踢出房间逻辑
-- 部分代码由AI生成
+- 此次更新部分代码由AI生成
 
 ## 1.相关技术
 
@@ -50,7 +55,7 @@ openssl req -nodes -new -x509 -keyout private-key.pem -out certificate.pem -days
 ```
 cd ..
 
-node run.js                 # 访问 https://[ipv6]:8887
+node run.js                 # 访问 https://[ipv4/ipv6]:8887
 
 ```
 
@@ -66,7 +71,7 @@ node run.js                 # 访问 https://[ipv6]:8887
 ![](./images/2.png)
 
 ### 第三步
-下方可以选择摄像头和麦克风，没有更多功能了
+下方可以选择摄像头和麦克风
 ![](./images/3.png)
 
 ## 4.最后
