@@ -69,14 +69,14 @@ wss.on('connection', (ws, req) => {
 
     // 成功加入房间逻辑
     const info_msg = existing_clients.length > 0 
-        ? `${existing_clients.join(',')} 已经在房间中` 
+        ? `${existing_clients.join(',')}已在房间中` 
         : `房间暂时只有你一人`;
 
     ws.send(JSON.stringify({ "type": "info", "data": info_msg }));
 
     client_equal_send(ws, {
         "type": "info",
-        "data": `${ws.url_base}加入房间`
+        "data": `${ws.url_base}加入`
     });
 
     // 消息转发
@@ -94,7 +94,7 @@ wss.on('connection', (ws, req) => {
     ws.on('close', () => {
         client_equal_send(ws, {
             "type": "info",
-            "data": `${ws.url_base}离开房间`
+            "data": `${ws.url_base}离开`
         });
     });
 });
