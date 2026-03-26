@@ -9,25 +9,30 @@
     <title>视频通话</title>
 </head>
 <body>
-	<div id="container">
-		<div class="video-box">
-			<div id="time_counter">00:00:00</div>
-			<video id="remote-video"></video>
-			<video id="local-video" muted></video>
-			<div class="logger"></div>
-		</div>
+    <div id="container">
+        <div class="video-box">
+            <div id="time_counter">00:00:00</div>
+            <video id="remote-video"></video>
+            <video id="local-video" muted></video>
+            <div class="logger"></div>
+            
+            <div class="chat-container">
+                <div class="chat-messages" id="chat-messages"></div>
+                <div class="chat-input-area">
+                    <input type="text" id="chat-input" placeholder="输入消息..." autocomplete="off">
+                    <button id="chat-send-btn" onclick="sendChatMessage()">发送</button>
+                </div>
+            </div>
+        </div>
 
-		<div class="controls-bar">
-			<button class="start-button" onclick="startLive()">开始</button>
-			<button class="stop-button"  onclick="stopPeerConnection()">结束</button>
-			<select id="cameraSelect"></select> 
-			<select id="audioInputSelect"></select> 
-		</div>
-	</div>
+        <div class="controls-bar">
+            <button class="start-button" onclick="startLive()">开始</button>
+            <button class="stop-button"  onclick="stopPeerConnection()">结束</button>
+            <select id="cameraSelect"></select> 
+            <select id="audioInputSelect"></select> 
+        </div>
+    </div>
 
-    
     <script src='/p2p.js' charset='utf-8'></script>
-
-
-    </body>
+</body>
 </html>
