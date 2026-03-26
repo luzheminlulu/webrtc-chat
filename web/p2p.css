@@ -34,7 +34,7 @@ body {
     position: absolute;
     right: 10px;
     bottom: 10px;
-    width: 120px;
+    width: 100px;
     /*aspect-ratio: 16 / 9;*/
     border-radius: 8px;
     box-shadow: 0 rgba(0,0,0,0);
@@ -52,23 +52,27 @@ body {
 
 #time_counter {
     position: absolute;
+    width: 175px;
+    text-align: center;
     left: 20px;
-    top: 15px;
-    padding: 4px 12px;
+    top: 25px;
+    border-radius:4px;
+    padding: 2px 22px;
     color: #ffffffC0;
     background: rgba(40, 40, 40, 0.7);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border-radius: 6px;
-    font-size: 24px;
+    font-size: 20px;
     z-index: 100;
 }
 
 /* 底部控制栏：改为弹性布局以适配手机 */
 .controls-bar {
-    position: absolute;
-    bottom: 25px;
-    left: 20px;
+    position: fixed;      /* 或 absolute */
+    bottom: 20px;         /* 距离底部留点缝隙通常更好看 */
+    left: 50%;
+    width: fit-content;   /* 宽度根据内容自适应 */
+    left: 10px;
     width: 100%;
     display: flex;
     justify-content: left;
@@ -76,15 +80,15 @@ body {
     gap: 10px;
     padding: 0 10px;
     box-sizing: border-box;
-    z-index: 110;
+    z-index: 105;
 }
 
 /* 统一控制栏元素样式 */
 .start-button, .stop-button, #cameraSelect, #audioInputSelect {
     position: static; /* 取消之前的绝对定位 */
-    height: 38px;
+    height: 40px;
     border: none;
-    border-radius: 8px;
+    border-radius: 6px;
     font-size: 13px;
     background-color: rgba(45, 45, 45, 0.6);
     color: white;
@@ -93,44 +97,85 @@ body {
 }
 
 .start-button, .stop-button {
-    width: 70px;
+    width: 85px;
     flex-shrink: 0;
 }
 
-.start-button { background-color: rgba(46, 125, 50, 0.4); }
-.stop-button { background-color: rgba(198, 40, 40, 0.4); }
+/* 基础样式保持 */
+.start-button, .stop-button {
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.25s ease; /* 稍微加快过渡，感觉更利落 */
+  font-weight: bold;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.2); /* 给文字也加点阴影，增加层次 */
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* --- 开始按钮 --- */
+.start-button {
+  background-color: rgba(46, 125, 50, 0.4); /* 提高不透明度 */
+  /* 多重阴影：一层深色厚度，一层淡淡的底部投影 */
+  box-shadow: 0 2px 0 rgb(29, 60, 31, 0.4),
+              0 4px 7px rgba(0, 0, 0, 0.2); 
+}
+
+/* --- 停止按钮 --- */
+.stop-button {
+  background-color: rgba(198, 40, 40, 0.4);
+  /* 同样的立体阴影结构 */
+  box-shadow: 0 2px 0 rgb(69, 41, 56, 0.4),
+              0 4px 7px rgba(0, 0, 0, 0.2);
+}
+
+.start-button:hover{background-color: rgba(46, 125, 50, 0.9);}
+.stop-button:hover{background-color: rgba(198, 40, 40, 0.9);}
+
+/* --- 按下效果 (Active) --- */
+.start-button:active, .stop-button:active {
+  transform: translateY(4px); /* 按下时大幅下移 */
+  /* 消除厚度阴影，只保留极小的投影 */
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2),
+              0 1px 2px rgba(0, 0, 0, 0.1);
+}
 
 #cameraSelect, #audioInputSelect {
     flex: 1; /* 自动撑开 */
-    max-width: 80px;
+    max-width: 75px;
     padding: 0 5px;
-    border: 1px solid rgba(255,255,255,0.1);
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: rgba(0, 0, 0, 0.4);
 }
 
 /* 桌面端大屏幕微调 */
 @media (min-width: 768px) {
+    .controls-bar { 
+        left: 0;
+        justify-content: center;
+        align-items: center;
+    }
     #local-video { width: 240px; }
-    .start-button, .stop-button { width: 160px; }
-    #cameraSelect, #audioInputSelect { max-width: 220px; }
+    .start-button, .stop-button { width: 220px; height: 36px;}
+    #cameraSelect, #audioInputSelect { max-width: 180px; }
 }
 
 .logger {
     /* 1. 定位：放在左侧，计时器下方 */
     position: absolute;
-    top: 40px; /* 避开左上角的计时器 */
-    right: 10px;
+    top: 60px; /* 避开左上角的计时器 */
+    left: 20px;
     
     /* 2. 尺寸与布局 */
-    width: 220px;
+    width: 215px;
     max-height: 20%; /* 限制高度，防止刷屏遮挡 */
-    padding: 10px;
+    padding: 10px 2px;
     
     /* 3. 视觉：精致半透明风格 */
     background: rgba(0, 0, 0, 0.4); /* 暗色半透明 */
     backdrop-filter: blur(8px);    /* 毛玻璃效果，确保在浅色背景下也能看清字 */
     -webkit-backdrop-filter: blur(8px);
-    border-radius: 8px;
+    border-radius:4px;
     /*border: 1px solid rgba(255, 255, 255, 0.1);*/
     
     /* 4. 文字样式 */
@@ -146,7 +191,8 @@ body {
     
     /* 隐藏滚动条 (可选，让界面更干净) */
     scrollbar-width: thin;
-    scrollbar-color: rgba(255,255,255,0.2) transparent;
+    scrollbar-color: rgba(255,255,255,0.05) transparent;
+    word-break: break-all;
 }
 
 /* 针对不同日志类型的颜色区分 */
@@ -163,4 +209,93 @@ body {
 
 .logger .info {
     color: #40a9ff; /* 蓝色信息提示 */
+}
+
+
+.chat-container {
+    position: absolute;
+    bottom:70px; /* 置于底部控制栏上方 */
+    left: 20px;
+    width: 250px;
+    height: 160px;
+    background: rgba(40, 40, 40, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    z-index: 110;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.chat-messages {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 13px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.chat-message {
+    margin-bottom: 8px;
+    word-wrap: break-word;
+    line-height: 1.4;
+}
+
+.chat-message .sender {
+    font-weight: bold;
+    margin-right: 4px;
+}
+
+.chat-message.local .sender { color: #4CAF50; } /* 自己发的消息：绿色 */
+.chat-message.remote .sender { color: #2196F3; } /* 对方发的消息：蓝色 */
+
+.chat-input-area {
+    display: flex;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+#chat-input {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+    color: white;
+    padding: 6px 8px;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+#chat-input:focus { border-color: rgba(255, 255, 255, 0.4); }
+#chat-input::placeholder { color: rgba(255, 255, 255, 0.3); }
+
+#chat-send-btn {
+    background-color: rgba(46, 125, 50, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    border-radius: 4px;
+    margin-left: 6px;
+    padding: 0 8px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background 0.2s;
+}
+
+#chat-send-btn:hover { background-color: rgba(46, 125, 50, 0.9); }
+#chat-send-btn:active { transform: translateY(1px); }
+
+/* 桌面端大屏幕微调 */
+@media (min-width: 768px) {
+    .chat-container {
+        left: 20px;
+        width: 300px;
+        height: 250px;
+        bottom: 20px;
+    }
 }
