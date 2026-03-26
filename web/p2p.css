@@ -218,7 +218,7 @@ body {
     left: 20px;
     width: 250px;
     height: 160px;
-    background: rgba(40, 40, 40, 0.7);
+    background: rgba(40, 40, 40, 0.2);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-radius: 8px;
@@ -233,7 +233,7 @@ body {
     flex: 1;
     padding: 10px;
     overflow-y: auto;
-    color: rgba(255, 255, 255, 0.85);
+    color: rgba(255, 255, 255, 0.35);
     font-size: 13px;
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
