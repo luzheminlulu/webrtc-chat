@@ -27,11 +27,11 @@ setFullHeight();
 const message = {
 	el: document.querySelector('.logger'),
 	log (msg) {
-		this.el.innerHTML += `<span>${new Date().toLocaleTimeString()}：${msg}</span><br/>`;
+		this.el.innerHTML += `<span>${new Date().toLocaleTimeString()} ${msg}</span><br/>`;
 		this.el.scrollTop = this.el.scrollHeight;  
 	},
 	error (msg) {
-		this.el.innerHTML += `<span class="error">${new Date().toLocaleTimeString()}：${msg}</span><br/>`;
+		this.el.innerHTML += `<span class="error">${new Date().toLocaleTimeString()} ${msg}</span><br/>`;
 		this.el.scrollTop = this.el.scrollHeight;  
 	}
 };
@@ -120,8 +120,6 @@ async function processQueue() {
 		}
     }
 }  
-// ...（前面保留你的 setFullHeight, cookie操作, message对象, socket初始化, processQueue 等逻辑）...
-
 const PeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
 !PeerConnection && message.error('浏览器不支持WebRTC！');
 
@@ -130,8 +128,37 @@ var stream = null;
 var cameraID, audioID;
 var time_count_id;
 
+// 【新增全局变量】数据通道
+var dataChannel = null;
+
+// 【新增函数】统一配置 DataChannel 事件
+function setupDataChannel(channel) {
+    channel.onopen = () => console.log('[WebRTC] 聊天数据通道已开启');
+    channel.onclose = () => console.log('[WebRTC] 聊天数据通道已关闭');
+    channel.onmessage = (e) => {
+        try {
+            const data = JSON.parse(e.data);
+            if (data.type === 'chat_data') {
+                appendChatMessage('对方', data.message, true);
+            }
+        } catch (err) {
+            console.error('聊天消息解析失败', err);
+        }
+    };
+}
+
 async function newPeer(){
     peer = new PeerConnection();
+    
+    // 【新增】创建 WebRTC 数据通道（用于文字聊天）
+    dataChannel = peer.createDataChannel('chat_channel');
+    setupDataChannel(dataChannel);
+
+    // 【新增】监听远端的数据通道（主要针对接收方）
+    peer.ondatachannel = (e) => {
+        dataChannel = e.channel;
+        setupDataChannel(dataChannel);
+    };
     
     peer.ontrack = e => {
         if (e && e.streams) {
@@ -148,7 +175,7 @@ async function newPeer(){
         }
     };
 
-    // 新增：监听 ICE 连接状态变化
+    // 监听 ICE 连接状态变化
     peer.oniceconnectionstatechange = async () => {
         if (!peer) return;
         const state = peer.iceConnectionState;
@@ -159,7 +186,6 @@ async function newPeer(){
         } else if (state === 'failed') {
             message.error('连接断开，正在尝试静默重连 (ICE Restart)...');
             try {
-                // 核心重连逻辑：触发 ICE Restart
                 const offer = await peer.createOffer({ iceRestart: true });
                 await peer.setLocalDescription(offer);
                 socket.send(JSON.stringify(offer));
@@ -195,7 +221,7 @@ async function startLive (offerSdp) {
             const offer = await peer.createOffer();
             await peer.setLocalDescription(offer);
             socket.send(JSON.stringify(offer));
-        } else {
+    } else {
             message.log('接收通话');
             await peer.setRemoteDescription(offerSdp);
             const answer = await peer.createAnswer();
@@ -216,29 +242,63 @@ async function startLive (offerSdp) {
     startNetworkMonitoring(); // 开始监控网络状态
 }
 
+// 【新增功能】追加聊天消息到界面
+function appendChatMessage(sender, text, isRemote = false) {
+    const chatBox = document.getElementById('chat-messages');
+    if (!chatBox) return;
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `chat-message ${isRemote ? 'remote' : 'local'}`;
+    msgDiv.innerHTML = `<span class="sender">${sender}:</span><span class="text"></span>`;
+    // 使用 textContent 防止 XSS 注入
+    msgDiv.querySelector('.text').textContent = text;
+    chatBox.appendChild(msgDiv);
+    chatBox.scrollTop = chatBox.scrollHeight; 
+}
+
+// 【新增功能】发送文字消息
+function sendChatMessage() {
+    const input = document.getElementById('chat-input');
+    const text = input.value.trim();
+    if (!text) return;
+
+    if (dataChannel && dataChannel.readyState === 'open') {
+        const msgObj = { type: 'chat_data', message: text };
+        dataChannel.send(JSON.stringify(msgObj));
+        appendChatMessage('我', text, false);
+        input.value = ''; // 清空输入框
+    } else {
+        message.error('聊天通道未连接，无法发送消息');
+    }
+}
+
+// 【新增功能】回车键发送消息
+document.getElementById('chat-input').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        sendChatMessage();
+    }
+});
+
+// ...（中间保留原有的 startLive 函数不变）...
+
 async function stopPeerConnection(isRemoteAction) {  
     if(time_count_id) clearInterval(time_count_id);
     button_start.style.display = 'block';
     button_stop.style.display = 'none';
     stopNetworkMonitoring(); 
 
-    // 修正日志逻辑
     if(!isRemoteAction){
-        // 如果是我主动挂断，发消息通知对方
         socket.send(JSON.stringify({ type: `cmd_stop` }));
         message.log('你已关闭通话');  
     } else {
         message.log('对方已挂断通话'); 
     }
     
-    // 释放媒体流
     if(stream){
         stream.getTracks().forEach(track => {
             track.stop();
         });
     }
 
-    // 清空画面并重置 Video 标签
     [localVideo, remoteVideo].forEach(v => {
         v.pause();
         v.srcObject = null;
@@ -246,26 +306,25 @@ async function stopPeerConnection(isRemoteAction) {
     });
 
     stream = null;
+    
+    // 【新增】清理 DataChannel
+    if (dataChannel) {
+        dataChannel.close();
+        dataChannel = null;
+    }
+
     if (peer) {
-        // 重要：关闭前移除所有事件监听，防止闭包导致的内存泄露或重复触发
         peer.onicecandidate = null;
         peer.ontrack = null;
         peer.oniceconnectionstatechange = null;
         peer.onconnectionstatechange = null; 
+        peer.ondatachannel = null; // 清理事件
         peer.close();
         peer = null;
     }
     
-    // 重新初始化 Peer 以备下次呼叫
     await newPeer();
 }
-
-
-window.addEventListener('beforeunload', () => {
-  if (stream) {
-    stream.getTracks().forEach(track => track.stop());
-  }
-});
 
 async function getCameraList() {  
     try {
@@ -444,7 +503,7 @@ function getNetworkStatusUI() {
         ns = document.createElement('div');
         ns.id = 'network-status';
         // 绝对定位在右上角，不影响你现有的布局
-        ns.style.cssText = 'position:fixed; top:10px; right:10px; padding:5px 10px; background:rgba(0,0,0,0.6); color:#fff; border-radius:4px; font-size:12px; z-index:9999; display:none; transition: background 0.3s;';
+        ns.style.cssText = 'position:fixed; top:26px; right:20px; padding:5px 10px; background:rgba(0,0,0,0.6); color:#fff; border-radius:4px; font-size:16px; z-index:9999; display:none; transition: background 0.3s;';
         document.body.appendChild(ns);
     }
     return ns;
@@ -483,7 +542,7 @@ function startNetworkMonitoring() {
             });
 
             // 渲染状态到 UI
-            nsUI.innerHTML = `延迟: ${rtt.toFixed(0)}ms | 丢包: ${packetLoss.toFixed(1)}%`;
+            nsUI.innerHTML = `${rtt.toFixed(0)}ms | ${packetLoss.toFixed(1)}%`;
 
             // 根据阈值改变颜色反馈质量
             if (rtt > 300 || packetLoss > 8) {
