@@ -72,7 +72,7 @@ body {
     bottom: 20px;         /* 距离底部留点缝隙通常更好看 */
     left: 50%;
     width: fit-content;   /* 宽度根据内容自适应 */
-    left: 10px;
+    left: 20px;
     width: 100%;
     display: flex;
     justify-content: left;
@@ -289,6 +289,24 @@ body {
 
 #chat-send-btn:hover { background-color: rgba(46, 125, 50, 0.9); }
 #chat-send-btn:active { transform: translateY(1px); }
+
+
+/* 如果 chat-messages 里面没有消息，隐藏整个容器的背景、边框和阴影 */
+.chat-container:not(:has(.chat-message)) {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    height: auto; /* 让高度随内容塌陷，只剩输入框 */
+}
+
+/* 如果没有消息，隐藏消息列表区域的内边距 */
+.chat-messages:empty, 
+.chat-messages:not(:has(.chat-message)) {
+    display: none;
+}
+
 
 /* 桌面端大屏幕微调 */
 @media (min-width: 768px) {
